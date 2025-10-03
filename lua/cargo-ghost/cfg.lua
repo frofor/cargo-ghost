@@ -1,6 +1,3 @@
----@class VirtualTextConfig
----@field prefix string
-
 ---@class HighlightConfig
 ---@field latest string
 ---@field outdated string
@@ -11,14 +8,14 @@
 
 ---@class Config
 ---@field enabled boolean
----@field virtual_text VirtualTextConfig
+---@field priority integer
+---@field prefix string
 ---@field highlight HighlightConfig
 ---@field cache CacheConfig
 local cfg = {
 	enabled = true,
-	virtual_text = {
-		prefix = ' # ',
-	},
+	priority = 90,
+	prefix = ' # ',
 	highlight = {
 		latest = 'Comment',
 		outdated = 'WarningMsg',

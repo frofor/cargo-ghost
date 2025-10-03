@@ -44,11 +44,11 @@ local function show_version(version, latest, line, buf, ns)
 	local outdated = is_outdated(version, latest)
 	local highlight = outdated and cfg.get().highlight.outdated or cfg.get().highlight.latest
 	local suffix = outdated and latest or 'latest'
-	local text = string.format('%s%s', cfg.get().virtual_text.prefix, suffix)
+	local text = string.format('%s%s', cfg.get().prefix, suffix)
 
 	vim.api.nvim_buf_set_extmark(buf, ns, line, 0, {
 		virt_text = { { text, highlight } },
-		priority = 100,
+		priority = cfg.get().priority,
 	})
 end
 
@@ -57,11 +57,11 @@ end
 ---@param buf integer
 ---@param ns integer
 local function show_error(text, line, buf, ns)
-	local formatted = string.format('%s%s', cfg.get().virtual_text.prefix, text)
+	local formatted = string.format('%s%s', cfg.get().prefix, text)
 
 	vim.api.nvim_buf_set_extmark(buf, ns, line, 0, {
 		virt_text = { { formatted, cfg.get().highlight.error } },
-		priority = 100,
+		priority = cfg.get().priority,
 	})
 end
 
