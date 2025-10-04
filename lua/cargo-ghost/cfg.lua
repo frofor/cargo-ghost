@@ -10,12 +10,14 @@
 ---@field enabled boolean
 ---@field priority integer
 ---@field prefix string
+---@field required_version 'stable'|'newest'
 ---@field highlight HighlightConfig
 ---@field cache CacheConfig
 local cfg = {
 	enabled = true,
 	priority = 90,
 	prefix = ' # ',
+	required_version = 'stable',
 	highlight = {
 		latest = 'Comment',
 		outdated = 'WarningMsg',

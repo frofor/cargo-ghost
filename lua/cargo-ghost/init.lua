@@ -20,11 +20,13 @@ local function update(buf)
 	local deps = parser.parse_cargo_toml(buf)
 	for _, dep in ipairs(deps) do
 		queue = queue + 1
-		api.get_latest_version(dep.name, function(latest, err)
+		api.get_crate_info(dep.name, function(info, err)
 			if err then
-				ui.show_error(err, dep.line, buf, ns)
+				ui.show_error(dep, err, buf, ns)
+			elseif dep.version > info.newest_version then
+				ui.show_error(dep, 'version not found', buf, ns)
 			else
-				ui.show_version(dep.version, latest, dep.line, buf, ns)
+				ui.show_dep_info(dep, info, buf, ns)
 			end
 			queue = queue - 1
 		end)

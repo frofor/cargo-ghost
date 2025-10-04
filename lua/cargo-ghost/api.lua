@@ -1,19 +1,24 @@
 local cfg = require('cargo-ghost.cfg')
 
+---@class CrateInfo
+---@field stable_version string
+---@field newest_version string
+
 ---@class CrateCache
----@field version string
+---@field info CrateInfo
 ---@field time number
 
 ---@type table<string, CrateCache>
 local cache = {}
 
----@param crate string
----@param fn fun(version: string?, err: string?)
-local function get_latest_version(crate, fn)
+---@param name string
+---@param fn fun(info: CrateInfo?, err: string?)
+local function get_crate_info(name, fn)
+	local cache_timeout = cfg.get().cache.timeout
 	local now = vim.loop.now()
 
-	if cache[crate] and now - cache[crate].time < cfg.get().cache.timeout then
-		fn(cache[crate].version, nil)
+	if cache[name] and now - cache[name].time < cache_timeout then
+		fn(cache[name].info, nil)
 		return
 	end
 
@@ -22,7 +27,7 @@ local function get_latest_version(crate, fn)
 		'-s',
 		'--max-time', '10',
 		'--user-agent', 'cargo-ghost',
-		string.format('https://crates.io/api/v1/crates/%s', crate),
+		string.format('https://crates.io/api/v1/crates/%s', name),
 	}
 
 	vim.system(cmd, {}, function(res)
@@ -43,13 +48,15 @@ local function get_latest_version(crate, fn)
 				return
 			end
 
-			local version = data.crate.newest_version
-			cache[crate] = { version = version, time = now }
-			fn(version, nil)
+			local stable = data.crate.max_stable_version
+			local newest = data.crate.newest_version
+			local info = { stable_version = stable, newest_version = newest }
+			cache[name] = { info = info, time = now }
+			fn(info, nil)
 		end)
 	end)
 end
 
 local M = {}
-M.get_latest_version = get_latest_version
+M.get_crate_info = get_crate_info
 return M

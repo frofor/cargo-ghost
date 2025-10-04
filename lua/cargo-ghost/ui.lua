@@ -1,33 +1,33 @@
 local cfg = require('cargo-ghost.cfg')
 
----@param version string
----@param latest string
+---@param cur string
+---@param exp string
 ---@return boolean
-local function is_outdated(version, latest)
-	if version == latest then
+local function is_outdated(cur, exp)
+	if cur == exp then
 		return false
 	end
 
-	local version_clean = version:gsub('^[^%d]*', '')
-	local latest_clean = latest:gsub('^[^%d]*', '')
+	local cur_clean = cur:gsub('^[^%d]*', '')
+	local exp_clean = exp:gsub('^[^%d]*', '')
 
-	local version_parts = vim.split(version_clean, '%.')
-	local latest_parts = vim.split(latest_clean, '%.')
+	local cur_parts = vim.split(cur_clean, '%.')
+	local exp_parts = vim.split(exp_clean, '%.')
 
-	while #version_parts < 3 do
-		table.insert(version_parts, '0')
+	while #cur_parts < 3 do
+		table.insert(cur_parts, '0')
 	end
-	while #latest_parts < 3 do
-		table.insert(latest_parts, '0')
+	while #exp_parts < 3 do
+		table.insert(exp_parts, '0')
 	end
 
 	for i = 1, 3 do
-		local version_num = tonumber(version_parts[i]) or 0
-		local latest_num = tonumber(latest_parts[i]) or 0
+		local cur_num = tonumber(cur_parts[i]) or 0
+		local exp_num = tonumber(exp_parts[i]) or 0
 
-		if version_num < latest_num then
+		if cur_num < exp_num then
 			return true
-		elseif version_num > latest_num then
+		elseif cur_num > exp_num then
 			return false
 		end
 	end
@@ -35,37 +35,39 @@ local function is_outdated(version, latest)
 	return false
 end
 
----@param version string
----@param latest string
----@param line integer
+---@param dep Dependency
+---@param info CrateInfo
 ---@param buf integer
 ---@param ns integer
-local function show_version(version, latest, line, buf, ns)
-	local outdated = is_outdated(version, latest)
+local function show_dep_info(dep, info, buf, ns)
+	local cur = dep.version
+	local exp = cfg.get().required_version == 'stable' and info.stable_version or info.newest_version
+	local outdated = is_outdated(cur, exp)
+
 	local highlight = outdated and cfg.get().highlight.outdated or cfg.get().highlight.latest
-	local suffix = outdated and latest or 'latest'
+	local suffix = outdated and exp or 'latest'
 	local text = string.format('%s%s', cfg.get().prefix, suffix)
 
-	vim.api.nvim_buf_set_extmark(buf, ns, line, 0, {
+	vim.api.nvim_buf_set_extmark(buf, ns, dep.line, 0, {
 		virt_text = { { text, highlight } },
 		priority = cfg.get().priority,
 	})
 end
 
+---@param dep Dependency
 ---@param text string
----@param line integer
 ---@param buf integer
 ---@param ns integer
-local function show_error(text, line, buf, ns)
+local function show_error(dep, text, buf, ns)
 	local formatted = string.format('%s%s', cfg.get().prefix, text)
 
-	vim.api.nvim_buf_set_extmark(buf, ns, line, 0, {
+	vim.api.nvim_buf_set_extmark(buf, ns, dep.line, 0, {
 		virt_text = { { formatted, cfg.get().highlight.error } },
 		priority = cfg.get().priority,
 	})
 end
 
 local M = {}
-M.show_version = show_version
+M.show_dep_info = show_dep_info
 M.show_error = show_error
 return M
