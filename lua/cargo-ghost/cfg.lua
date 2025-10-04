@@ -1,11 +1,15 @@
----@class FormatConfig
----@field updated string
----@field outdated string
----@field error string
+---@class FormatVersionConfig
+---@field enabled boolean
+---@field updated string?
+---@field outdated string?
 
----@class HighlightConfig
----@field updated string
----@field outdated string
+---@class FormatSummaryConfig
+---@field enabled boolean
+---@field format string
+
+---@class FormatConfig
+---@field version FormatVersionConfig
+---@field summary FormatSummaryConfig
 ---@field error string
 
 ---@class CacheConfig
@@ -16,21 +20,22 @@
 ---@field priority integer
 ---@field wanted_version 'stable'|'newest'
 ---@field format FormatConfig
----@field highlight HighlightConfig
 ---@field cache CacheConfig
 local cfg = {
 	enabled = true,
 	priority = 90,
 	wanted_version = 'stable',
 	format = {
-		updated = ' # updated',
-		outdated = ' # {wanted}',
+		version = {
+			enabled = true,
+			updated = nil,
+			outdated = ' # {wanted}',
+		},
+		summary = {
+			enabled = false,
+			format = ' # {summary}',
+		},
 		error = ' # {error}',
-	},
-	highlight = {
-		updated = 'Comment',
-		outdated = 'WarningMsg',
-		error = 'ErrorMsg',
 	},
 	cache = {
 		timeout = 300000,
@@ -46,7 +51,22 @@ local function get()
 	return cfg
 end
 
+local function toggle()
+	cfg.enabled = not cfg.enabled
+end
+
+local function toggle_version()
+	cfg.format.version.enabled = not cfg.format.version.enabled
+end
+
+local function toggle_summary()
+	cfg.format.summary.enabled = not cfg.format.summary.enabled
+end
+
 local M = {}
 M.setup = setup
 M.get = get
+M.toggle = toggle
+M.toggle_version = toggle_version
+M.toggle_summary = toggle_summary
 return M

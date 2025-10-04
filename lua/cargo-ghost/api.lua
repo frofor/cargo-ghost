@@ -1,24 +1,25 @@
 local cfg = require('cargo-ghost.cfg')
 
----@class CrateInfo
+---@class Crate
+---@field summary string
 ---@field stable_version string
 ---@field newest_version string
 
 ---@class CrateCache
----@field info CrateInfo
+---@field crate Crate
 ---@field time number
 
 ---@type table<string, CrateCache>
 local cache = {}
 
 ---@param name string
----@param fn fun(info: CrateInfo?, err: string?)
+---@param fn fun(crate: Crate?, err: string?)
 local function get_crate_info(name, fn)
 	local cache_timeout = cfg.get().cache.timeout
 	local now = vim.loop.now()
 
 	if cache[name] and now - cache[name].time < cache_timeout then
-		fn(cache[name].info, nil)
+		fn(cache[name].crate, nil)
 		return
 	end
 
@@ -48,11 +49,12 @@ local function get_crate_info(name, fn)
 				return
 			end
 
+			local summary = data.crate.description:gsub('\n', ' ')
 			local stable = data.crate.max_stable_version
 			local newest = data.crate.newest_version
-			local info = { stable_version = stable, newest_version = newest }
-			cache[name] = { info = info, time = now }
-			fn(info, nil)
+			local crate = { summary = summary, stable_version = stable, newest_version = newest }
+			cache[name] = { crate = crate, time = now }
+			fn(crate, nil)
 		end)
 	end)
 end

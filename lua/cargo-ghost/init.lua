@@ -20,13 +20,13 @@ local function update(buf)
 	local deps = parser.parse_cargo_toml(buf)
 	for _, dep in ipairs(deps) do
 		queue = queue + 1
-		api.get_crate_info(dep.name, function(info, err)
+		api.get_crate_info(dep.name, function(crate, err)
 			if err then
 				ui.show_error(dep, err, buf, ns)
-			elseif dep.version > info.newest_version then
+			elseif dep.version > crate.newest_version then
 				ui.show_error(dep, 'version not found', buf, ns)
 			else
-				ui.show_dep_info(dep, info, buf, ns)
+				ui.show_dep(dep, crate, buf, ns)
 			end
 			queue = queue - 1
 		end)
@@ -45,31 +45,43 @@ local function setup(opts)
 	})
 end
 
-local function toggle()
-	cfg.enabled = not cfg.enabled
-
+local function reattach()
 	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-		if not cfg.enabled then
-			vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
-			goto continue
-		end
-
 		if not vim.api.nvim_buf_is_loaded(buf) then
 			goto continue
 		end
 
 		local name = vim.api.nvim_buf_get_name(buf)
-		if name:match('Cargo%.toml$') then
-			update(buf)
+		if not name:match('Cargo%.toml$') then
+			goto continue
 		end
 
+		vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
+		update(buf)
 		::continue::
 	end
+end
+
+local function toggle()
+	cfg.toggle()
+	reattach()
+end
+
+local function toggle_version()
+	cfg.toggle_version()
+	reattach()
+end
+
+local function toggle_summary()
+	cfg.toggle_summary()
+	reattach()
 end
 
 ---@class CargoGhost
 local M = {}
 M.setup = setup
-M.update = update
+M.reattach = reattach
 M.toggle = toggle
+M.toggle_version = toggle_version
+M.toggle_summary = toggle_summary
 return M
