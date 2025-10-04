@@ -7,7 +7,7 @@
 ---@param linenr integer
 ---@return Dependency|nil
 local function parse_dep(line, linenr)
-	local crate, version = line:match('^%s*([%w_%-]+)%s*=%s*"([^"]+)"')
+	local crate, version = line:match('^%s*([%w_%-]+)%s*=%s*["\']([^"\']+)["\']')
 	if crate and version then
 		return { name = crate, version = version, line = linenr - 1 }
 	end
@@ -17,7 +17,7 @@ local function parse_dep(line, linenr)
 		return nil
 	end
 
-	version = line:match('version%s*=%s*"([^"]+)"')
+	version = line:match('version%s*=%s*["\']([^"\']+)["\']')
 	if not version then
 		return nil
 	end
