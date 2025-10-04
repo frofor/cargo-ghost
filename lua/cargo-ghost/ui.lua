@@ -35,53 +35,31 @@ local function is_updated(given, wanted)
 end
 
 ---@param dep Dependency
----@param wanted string
----@param buf integer
----@param ns integer
-local function show_updated_version(dep, wanted, buf, ns)
-	local fmt = cfg.get().format.version.updated
-	if not fmt then
-		return
-	end
-
-	local text = fmt:gsub('{wanted}', wanted)
-	vim.api.nvim_buf_set_extmark(buf, ns, dep.line, 0, {
-		virt_text = { { text, 'Comment' } },
-		priority = cfg.get().priority,
-	})
-end
-
----@param dep Dependency
----@param wanted string
----@param buf integer
----@param ns integer
-local function show_outdated_version(dep, wanted, buf, ns)
-	local fmt = cfg.get().format.version.outdated
-	if not fmt then
-		return
-	end
-
-	local text = fmt:gsub('{wanted}', wanted)
-	vim.api.nvim_buf_set_extmark(buf, ns, dep.line, 0, {
-		virt_text = { { text, 'WarningMsg' } },
-		priority = cfg.get().priority,
-	})
-end
-
----@param dep Dependency
 ---@param crate Crate
 ---@param buf integer
 ---@param ns integer
 local function show_dep_version(dep, crate, buf, ns)
-	local wanted = cfg.get().wanted_version == 'stable'
-		and crate.stable_version
-		or crate.newest_version
+	local stable_version = crate.stable_version
+	local newest_version = crate.newest_version
+	local wanted = cfg.get().wanted_version == 'stable' and stable_version or newest_version
+	local updated = is_updated(dep.version, wanted)
+	local highlight = updated and 'Comment' or 'WarningMsg'
 
-	if is_updated(dep.version, wanted) then
-		show_updated_version(dep, wanted, buf, ns)
+	local fmt
+	if updated then
+		fmt = cfg.get().format.version.updated
 	else
-		show_outdated_version(dep, wanted, buf, ns)
+		fmt = cfg.get().format.version.outdated
 	end
+	if not fmt then
+		return
+	end
+
+	local text = fmt:gsub('{wanted}', wanted)
+	vim.api.nvim_buf_set_extmark(buf, ns, dep.line, 0, {
+		virt_text = { { text, highlight } },
+		priority = cfg.get().priority,
+	})
 end
 
 ---@param dep Dependency
@@ -114,7 +92,7 @@ end
 ---@param err string
 ---@param buf integer
 ---@param ns integer
-local function show_error(dep, err, buf, ns)
+local function show_err(dep, err, buf, ns)
 	local text = cfg.get().format.error
 		:gsub('{version}', dep.version)
 		:gsub('{error}', err)
@@ -127,5 +105,5 @@ end
 
 local M = {}
 M.show_dep = show_dep
-M.show_error = show_error
+M.show_err = show_err
 return M

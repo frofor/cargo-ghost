@@ -14,7 +14,7 @@ local cache = {}
 
 ---@param name string
 ---@param fn fun(crate: Crate?, err: string?)
-local function get_crate_info(name, fn)
+local function get_crate(name, fn)
 	local cache_timeout = cfg.get().cache.timeout
 	local now = vim.loop.now()
 
@@ -60,5 +60,5 @@ local function get_crate_info(name, fn)
 end
 
 local M = {}
-M.get_crate_info = get_crate_info
+M.get_crate = get_crate
 return M

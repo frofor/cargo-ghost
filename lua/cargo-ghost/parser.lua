@@ -3,28 +3,6 @@
 ---@field version string
 ---@field line integer
 
----@param line string
----@param linenr integer
----@return Dependency|nil
-local function parse_dep(line, linenr)
-	local crate, version = line:match('^%s*([%w_%-]+)%s*=%s*["\']([^"\']+)["\']')
-	if crate and version then
-		return { name = crate, version = version, line = linenr - 1 }
-	end
-
-	crate = line:match('^%s*([%w_%-]+)%s*=%s*{')
-	if not crate then
-		return nil
-	end
-
-	version = line:match('version%s*=%s*["\']([^"\']+)["\']')
-	if not version then
-		return nil
-	end
-
-	return { name = crate, version = version, line = linenr - 1 }
-end
-
 ---@param buf integer
 ---@return Dependency[]
 local function parse_cargo_toml(buf)
@@ -33,22 +11,24 @@ local function parse_cargo_toml(buf)
 	local in_deps = false
 
 	for linenr, line in ipairs(lines) do
-		if line:match('^%s*%[dependencies')
+		in_deps = line:match('^%s*%[dependencies')
 			or line:match('^%s*%[dev-dependencies')
 			or line:match('^%s*%[build-dependencies')
-		then
-			in_deps = true
-		elseif line:match('^%s*%[') then
-			in_deps = false
-		end
+			or (in_deps and not line:match('^%s*%['))
 
 		if not in_deps then
 			goto continue
 		end
 
-		local dep = parse_dep(line, linenr)
-		if dep then
-			table.insert(deps, dep)
+		local name, version = line:match('^%s*([%w_%-]+)%s*=%s*["\']([^"\']+)["\']')
+		if name then
+			table.insert(deps, { name = name, version = version, line = linenr - 1 })
+			goto continue
+		end
+
+		name, version = line:match('^%s*([%w_%-]+)%s*=%s*{.*version%s*=%s*["\']([^"\']+)["\']')
+		if name then
+			table.insert(deps, { name = name, version = version, line = linenr - 1 })
 		end
 
 		::continue::
