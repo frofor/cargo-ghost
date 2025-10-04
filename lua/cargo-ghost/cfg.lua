@@ -1,5 +1,10 @@
+---@class FormatConfig
+---@field updated string
+---@field outdated string
+---@field error string
+
 ---@class HighlightConfig
----@field latest string
+---@field updated string
 ---@field outdated string
 ---@field error string
 
@@ -9,17 +14,21 @@
 ---@class Config
 ---@field enabled boolean
 ---@field priority integer
----@field prefix string
----@field required_version 'stable'|'newest'
+---@field wanted_version 'stable'|'newest'
+---@field format FormatConfig
 ---@field highlight HighlightConfig
 ---@field cache CacheConfig
 local cfg = {
 	enabled = true,
 	priority = 90,
-	prefix = ' # ',
-	required_version = 'stable',
+	wanted_version = 'stable',
+	format = {
+		updated = ' # updated',
+		outdated = ' # {wanted}',
+		error = ' # {error}',
+	},
 	highlight = {
-		latest = 'Comment',
+		updated = 'Comment',
 		outdated = 'WarningMsg',
 		error = 'ErrorMsg',
 	},
