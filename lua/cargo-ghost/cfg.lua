@@ -2,6 +2,7 @@
 ---@field enabled boolean
 ---@field updated string?
 ---@field outdated string?
+---@field nonexistent string?
 
 ---@class FormatSummaryConfig
 ---@field enabled boolean
@@ -30,6 +31,7 @@ local cfg = {
 			enabled = true,
 			updated = nil,
 			outdated = ' # {wanted}',
+			nonexistent = ' # version does not exist',
 		},
 		summary = {
 			enabled = false,

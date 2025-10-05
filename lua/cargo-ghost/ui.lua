@@ -1,37 +1,25 @@
 local cfg = require('cargo-ghost.cfg')
 
----@param given string
+---@param actual string
 ---@param wanted string
-local function is_updated(given, wanted)
-	if given == wanted then
-		return true
-	end
-
-	local given_clean = given:gsub('^[^%d]*', '')
+local function is_outdated(actual, wanted)
+	local actual_clean = actual:gsub('^[^%d]*', '')
 	local wanted_clean = wanted:gsub('^[^%d]*', '')
+	if actual_clean == wanted_clean then return false end
 
-	local given_parts = vim.split(given_clean, '%.')
+	local actual_parts = vim.split(actual_clean, '%.')
 	local wanted_parts = vim.split(wanted_clean, '%.')
-
-	while #given_parts < 3 do
-		table.insert(given_parts, '0')
-	end
-	while #wanted_parts < 3 do
-		table.insert(wanted_parts, '0')
-	end
+	while #actual_parts < 3 do table.insert(actual_parts, '0') end
+	while #wanted_parts < 3 do table.insert(wanted_parts, '0') end
 
 	for i = 1, 3 do
-		local given_num = tonumber(given_parts[i]) or 0
+		local actual_num = tonumber(actual_parts[i]) or 0
 		local wanted_num = tonumber(wanted_parts[i]) or 0
-
-		if given_num < wanted_num then
-			return false
-		elseif given_num > wanted_num then
-			return true
-		end
+		if actual_num < wanted_num then return true end
+		if actual_num > wanted_num then return false end
 	end
 
-	return true
+	return false
 end
 
 ---@param dep Dependency
@@ -39,23 +27,22 @@ end
 ---@param buf integer
 ---@param ns integer
 local function show_dep_version(dep, crate, buf, ns)
-	local stable_version = crate.stable_version
-	local newest_version = crate.newest_version
-	local wanted = cfg.get().wanted_version == 'stable' and stable_version or newest_version
-	local updated = is_updated(dep.version, wanted)
-	local highlight = updated and 'Comment' or 'WarningMsg'
+	local stable = crate.stable_version
+	local newest = crate.newest_version
+	local wanted = cfg.get().wanted_version == 'stable' and stable or newest
 
-	local fmt
-	if updated then
-		fmt = cfg.get().format.version.updated
+	local text, highlight
+	if is_outdated(wanted, dep.version) then
+		text, highlight = cfg.get().format.version.nonexistent, 'ErrorMsg'
+	elseif is_outdated(dep.version, wanted) then
+		text, highlight = cfg.get().format.version.outdated, 'WarningMsg'
 	else
-		fmt = cfg.get().format.version.outdated
-	end
-	if not fmt then
-		return
+		text, highlight = cfg.get().format.version.updated, 'Comment'
 	end
 
-	local text = fmt:gsub('{wanted}', wanted)
+	if not text then return end
+	text = text:gsub('{actual}', dep.version):gsub('{wanted}', wanted)
+
 	vim.api.nvim_buf_set_extmark(buf, ns, dep.line, 0, {
 		virt_text = { { text, highlight } },
 		priority = cfg.get().priority,

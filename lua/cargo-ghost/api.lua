@@ -34,13 +34,13 @@ local function get_crate(name, fn)
 	vim.system(cmd, {}, function(res)
 		vim.schedule(function()
 			if res.code ~= 0 then
-				fn(nil, 'crates.io failed')
+				fn(nil, 'curl failed')
 				return
 			end
 
 			local ok, data = pcall(vim.json.decode, res.stdout)
 			if not ok then
-				fn(nil, 'crates.io JSON failed')
+				fn(nil, 'json failed')
 				return
 			end
 

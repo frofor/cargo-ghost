@@ -23,8 +23,6 @@ local function update(buf)
 		api.get_crate(dep.name, function(crate, err)
 			if err then
 				ui.show_err(dep, err, buf, ns)
-			elseif dep.version > crate.newest_version then
-				ui.show_err(dep, 'version not found', buf, ns)
 			else
 				ui.show_dep(dep, crate, buf, ns)
 			end
