@@ -25,12 +25,12 @@ local cfg = {
 	format = {
 		version = {
 			enabled = true,
-			updated = nil,
-			outdated = ' # {wanted}',
-			nonexistent = ' # {wanted}',
-			nonexistent_stable = ' # crate is unstable',
+			updated = '  latest',
+			outdated = ' 󰇚 {wanted}',
+			nonexistent = '  {wanted}',
+			nonexistent_stable = '  unstable',
 		},
-		error = ' # {error}',
+		error = '  {error}',
 	},
 	cache = {
 		timeout = 300000,
