@@ -12,8 +12,8 @@ local function parse_cargo_toml(buf)
 
 	for linenr, line in ipairs(lines) do
 		in_deps = line:match('^%s*%[dependencies')
-			or line:match('^%s*%[dev-dependencies')
-			or line:match('^%s*%[build-dependencies')
+			or line:match('^%s*%[dev%-dependencies')
+			or line:match('^%s*%[build%-dependencies')
 			or (in_deps and not line:match('^%s*%['))
 
 		if not in_deps then
