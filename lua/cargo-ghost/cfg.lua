@@ -1,4 +1,4 @@
----@class FormatVersionConfig
+---@class DependencyFormatConfig
 ---@field enabled boolean
 ---@field updated string?
 ---@field outdated string?
@@ -6,7 +6,7 @@
 ---@field nonexistent_stable string?
 
 ---@class FormatConfig
----@field version FormatVersionConfig
+---@field dependency DependencyFormatConfig
 ---@field error string
 
 ---@class CacheConfig
@@ -21,9 +21,9 @@
 local cfg = {
 	enabled = true,
 	priority = 90,
-	wanted_version = 'stable',
+	wanted_version = 'newest',
 	format = {
-		version = {
+		dependency = {
 			enabled = true,
 			updated = '  latest',
 			outdated = ' 󰇚 {wanted}',
@@ -50,13 +50,13 @@ local function toggle()
 	cfg.enabled = not cfg.enabled
 end
 
-local function toggle_version()
-	cfg.format.version.enabled = not cfg.format.version.enabled
+local function toggle_dep()
+	cfg.format.dependency.enabled = not cfg.format.dependency.enabled
 end
 
 local M = {}
 M.setup = setup
 M.get = get
 M.toggle = toggle
-M.toggle_version = toggle_version
+M.toggle_dep = toggle_dep
 return M

@@ -27,7 +27,7 @@ end
 ---@param buf integer
 ---@param ns integer
 local function show_dep(dep, crate, buf, ns)
-	if not cfg.get().format.version.enabled then return end
+	if not cfg.get().format.dependency.enabled then return end
 
 	local stable = crate.stable_version
 	local newest = crate.newest_version
@@ -36,17 +36,17 @@ local function show_dep(dep, crate, buf, ns)
 
 	local text, highlight
 	if not wanted then
-		text, highlight = cfg.get().format.version.nonexistent_stable, 'ErrorMsg'
+		text, highlight = cfg.get().format.dependency.nonexistent_stable, 'ErrorMsg'
 	elseif is_outdated(wanted, dep.version) then
-		text, highlight = cfg.get().format.version.nonexistent, 'ErrorMsg'
+		text, highlight = cfg.get().format.dependency.nonexistent, 'ErrorMsg'
 	elseif is_outdated(dep.version, wanted) then
-		text, highlight = cfg.get().format.version.outdated, 'WarningMsg'
+		text, highlight = cfg.get().format.dependency.outdated, 'WarningMsg'
 	else
-		text, highlight = cfg.get().format.version.updated, 'Comment'
+		text, highlight = cfg.get().format.dependency.updated, 'Comment'
 	end
 
 	if not text then return end
-	text = text:gsub('{actual}', dep.version):gsub('{wanted}', wanted or '')
+	text = text:gsub('{actual}', dep.version):gsub('{wanted}', wanted or '?.?.?')
 
 	vim.api.nvim_buf_set_extmark(buf, ns, dep.line, 0, {
 		virt_text = { { text, highlight } },
@@ -82,7 +82,7 @@ end
 ---@param crate Crate
 local function open_dep_win(crate)
 	local lines = {}
-	table.insert(lines, string.format(' %s v%s', crate.name, crate.stable_version))
+	table.insert(lines, string.format(' %s v%s', crate.name, crate.stable_version or '?.?.?'))
 	table.insert(lines, string.rep('-', #crate.name + 2))
 	for l in crate.desc:gmatch('[^\r\n]+') do table.insert(lines, l) end
 	table.insert(lines, '')

@@ -85,8 +85,8 @@ local function toggle()
 	reattach()
 end
 
-local function toggle_version()
-	cfg.toggle_version()
+local function toggle_dep()
+	cfg.toggle_dep()
 	reattach()
 end
 
@@ -95,5 +95,5 @@ local M = {}
 M.setup = setup
 M.reattach = reattach
 M.toggle = toggle
-M.toggle_version = toggle_version
+M.toggle_dep = toggle_dep
 return M

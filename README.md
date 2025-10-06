@@ -21,43 +21,18 @@
 
 ## Configuration
 
-```lua
----@class FormatVersionConfig
----@field enabled boolean
----@field updated string?
----@field outdated string?
----@field nonexistent string?
----@field nonexistent_stable string?
-
----@class FormatConfig
----@field version FormatVersionConfig
----@field error string
-
----@class CacheConfig
----@field timeout integer
-
----@class Config
----@field enabled boolean
----@field priority integer
----@field wanted_version 'stable'|'newest'
----@field format FormatConfig
----@field cache CacheConfig
-{
-	enabled = true,
-	priority = 90,
-	wanted_version = 'stable',
-	format = {
-		version = {
-			enabled = true,
-			updated = '  latest',
-			outdated = ' 󰇚 {wanted}',
-			nonexistent = '  {wanted}',
-			nonexistent_stable = '  unstable',
-		},
-		error = '  {error}',
-	},
-	cache = {
-		timeout = 300000,
-	},
-}
-```
+- `enabled` (boolean): Whether plugin should be enabled (default: `true`).
+- `priority` (integer): Priority of the virtual text. Highest priority is last (default: `90`).
+- `wanted_version`: Wanted version of dependencies. Possible values:
+  - `'stable'`: Stable version (default).
+  - `'newest'`: Newest version, such as RC.
+- `format`: Format of the virtual text.
+  - `dependency`: Format of the dependency virtual text.
+    - `enabled` (boolean): Whether virtual text should be shown (default: `true`).
+    - `updated` (string?): Format if the dependency is updated (default: `'  latest'`).
+    - `outdated` (string?): Format if the dependency is outdated (default: `' 󰇚 {wanted}'`).
+    - `nonexistent` (string?): Format if the version does not exist (default: `'  {wanted}'`).
+    - `nonexistent_stable` (string?): Format if the stable version does not exist (default: `'  unstable'`).
+  - `error` (string): Format of the error (default: `'  {error}'`).
+- `cache`:
+  - `timeout` (integer): Timeout of the crates cache invalidation in milliseconds (default: `300000`).
