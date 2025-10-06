@@ -4,13 +4,8 @@
 ---@field outdated string?
 ---@field nonexistent string?
 
----@class FormatSummaryConfig
----@field enabled boolean
----@field format string
-
 ---@class FormatConfig
 ---@field version FormatVersionConfig
----@field summary FormatSummaryConfig
 ---@field error string
 
 ---@class CacheConfig
@@ -32,10 +27,6 @@ local cfg = {
 			updated = nil,
 			outdated = ' # {wanted}',
 			nonexistent = ' # version does not exist',
-		},
-		summary = {
-			enabled = false,
-			format = ' # {summary}',
 		},
 		error = ' # {error}',
 	},
@@ -61,14 +52,9 @@ local function toggle_version()
 	cfg.format.version.enabled = not cfg.format.version.enabled
 end
 
-local function toggle_summary()
-	cfg.format.summary.enabled = not cfg.format.summary.enabled
-end
-
 local M = {}
 M.setup = setup
 M.get = get
 M.toggle = toggle
 M.toggle_version = toggle_version
-M.toggle_summary = toggle_summary
 return M

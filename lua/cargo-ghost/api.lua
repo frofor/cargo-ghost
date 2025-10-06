@@ -1,7 +1,21 @@
 local cfg = require('cargo-ghost.cfg')
 
+---@param v any
+---@return string|number|boolean?
+local function prim(v)
+	local t = type(v)
+	if t == 'string' or t == 'number' or t == 'boolean' or v == nil then return v end
+	return nil
+end
+
 ---@class Crate
----@field summary string
+---@field name string
+---@field desc string
+---@field home string?
+---@field docs string?
+---@field repo string?
+---@field downloads integer
+---@field recent_downloads integer
 ---@field stable_version string
 ---@field newest_version string
 
@@ -49,10 +63,17 @@ local function get_crate(name, fn)
 				return
 			end
 
-			local summary = data.crate.description:gsub('\n', ' ')
-			local stable = data.crate.max_stable_version
-			local newest = data.crate.newest_version
-			local crate = { summary = summary, stable_version = stable, newest_version = newest }
+			local crate = {
+				name = data.crate.name,
+				desc = data.crate.description:gsub('\n', ' '),
+				home = prim(data.crate.homepage),
+				docs = prim(data.crate.documentation),
+				repo = prim(data.crate.repository),
+				downloads = data.crate.downloads,
+				recent_downloads = data.crate.recent_downloads,
+				stable_version = data.crate.max_stable_version,
+				newest_version = data.crate.newest_version,
+			}
 			cache[name] = { crate = crate, time = now }
 			fn(crate, nil)
 		end)

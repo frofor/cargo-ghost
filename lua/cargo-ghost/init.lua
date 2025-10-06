@@ -22,13 +22,30 @@ local function update(buf)
 		queue = queue + 1
 		api.get_crate(dep.name, function(crate, err)
 			if err then
-				ui.show_err(dep, err, buf, ns)
+				ui.show_dep_err(dep, err, buf, ns)
 			else
 				ui.show_dep(dep, crate, buf, ns)
 			end
 			queue = queue - 1
 		end)
 	end
+end
+
+---@param buf integer
+local function setup_hover(buf)
+	vim.keymap.set('n', 'K', function()
+		local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+		local deps = parser.parse_cargo_toml(buf)
+
+		local dep
+		for _, d in ipairs(deps) do if d.line == row then dep = d end end
+		if not dep then return end
+
+		api.get_crate(dep.name, function(crate, err)
+			if err then return end
+			ui.open_dep_win(crate)
+		end)
+	end, { buffer = buf, noremap = true })
 end
 
 ---@param opts table
@@ -39,7 +56,10 @@ local function setup(opts)
 	vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile', 'BufWritePost' }, {
 		group = group,
 		pattern = 'Cargo.toml',
-		callback = function(args) update(args.buf) end,
+		callback = function(args)
+			update(args.buf)
+			setup_hover(args.buf)
+		end,
 	})
 end
 
@@ -70,16 +90,10 @@ local function toggle_version()
 	reattach()
 end
 
-local function toggle_summary()
-	cfg.toggle_summary()
-	reattach()
-end
-
 ---@class CargoGhost
 local M = {}
 M.setup = setup
 M.reattach = reattach
 M.toggle = toggle
 M.toggle_version = toggle_version
-M.toggle_summary = toggle_summary
 return M

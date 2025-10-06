@@ -4,8 +4,8 @@
 
 ## Features
 
-- Shows dependency version information
-- Shows dependency summary information
+- Shows dependency version information in virtual text
+- Shows dependency documentation window on hover
 
 ## Installation
 
@@ -28,13 +28,8 @@
 ---@field outdated string?
 ---@field nonexistent string?
 
----@class FormatSummaryConfig
----@field enabled boolean
----@field format string
-
 ---@class FormatConfig
 ---@field version FormatVersionConfig
----@field summary FormatSummaryConfig
 ---@field error string
 
 ---@class CacheConfig
@@ -56,10 +51,6 @@
 			updated = nil,
 			outdated = ' # {wanted}',
 			nonexistent = ' # version does not exist',
-		},
-		summary = {
-			enabled = false,
-			format = ' # {summary}',
 		},
 		error = ' # {error}',
 	},
