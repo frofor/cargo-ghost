@@ -4,7 +4,7 @@ local cfg = require('cargo-ghost.cfg')
 ---@return string|number|boolean?
 local function prim(v)
 	local t = type(v)
-	if t == 'string' or t == 'number' or t == 'boolean' or v == nil then return v end
+	if t == 'string' or t == 'number' or t == 'boolean' then return v end
 	return nil
 end
 
@@ -14,10 +14,10 @@ end
 ---@field home string?
 ---@field docs string?
 ---@field repo string?
+---@field stable_version string?
+---@field newest_version string
 ---@field downloads integer
 ---@field recent_downloads integer
----@field stable_version string
----@field newest_version string
 
 ---@class CrateCache
 ---@field crate Crate
@@ -31,7 +31,6 @@ local cache = {}
 local function get_crate(name, fn)
 	local cache_timeout = cfg.get().cache.timeout
 	local now = vim.loop.now()
-
 	if cache[name] and now - cache[name].time < cache_timeout then
 		fn(cache[name].crate, nil)
 		return
@@ -69,10 +68,10 @@ local function get_crate(name, fn)
 				home = prim(data.crate.homepage),
 				docs = prim(data.crate.documentation),
 				repo = prim(data.crate.repository),
+				stable_version = prim(data.crate.max_stable_version),
+				newest_version = data.crate.newest_version,
 				downloads = data.crate.downloads,
 				recent_downloads = data.crate.recent_downloads,
-				stable_version = data.crate.max_stable_version,
-				newest_version = data.crate.newest_version,
 			}
 			cache[name] = { crate = crate, time = now }
 			fn(crate, nil)

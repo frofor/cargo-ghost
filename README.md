@@ -27,6 +27,7 @@
 ---@field updated string?
 ---@field outdated string?
 ---@field nonexistent string?
+---@field nonexistent_stable string?
 
 ---@class FormatConfig
 ---@field version FormatVersionConfig
@@ -50,7 +51,8 @@
 			enabled = true,
 			updated = nil,
 			outdated = ' # {wanted}',
-			nonexistent = ' # version does not exist',
+			nonexistent = ' # {wanted}',
+			nonexistent_stable = ' # crate is unstable',
 		},
 		error = ' # {error}',
 	},

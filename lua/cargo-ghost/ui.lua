@@ -26,13 +26,18 @@ end
 ---@param crate Crate
 ---@param buf integer
 ---@param ns integer
-local function show_dep_version(dep, crate, buf, ns)
+local function show_dep(dep, crate, buf, ns)
+	if not cfg.get().format.version.enabled then return end
+
 	local stable = crate.stable_version
 	local newest = crate.newest_version
-	local wanted = cfg.get().wanted_version == 'stable' and stable or newest
+	local wanted
+	if cfg.get().wanted_version == 'stable' then wanted = stable else wanted = newest end
 
 	local text, highlight
-	if is_outdated(wanted, dep.version) then
+	if not wanted then
+		text, highlight = cfg.get().format.version.nonexistent_stable, 'ErrorMsg'
+	elseif is_outdated(wanted, dep.version) then
 		text, highlight = cfg.get().format.version.nonexistent, 'ErrorMsg'
 	elseif is_outdated(dep.version, wanted) then
 		text, highlight = cfg.get().format.version.outdated, 'WarningMsg'
@@ -41,22 +46,12 @@ local function show_dep_version(dep, crate, buf, ns)
 	end
 
 	if not text then return end
-	text = text:gsub('{actual}', dep.version):gsub('{wanted}', wanted)
+	text = text:gsub('{actual}', dep.version):gsub('{wanted}', wanted or '')
 
 	vim.api.nvim_buf_set_extmark(buf, ns, dep.line, 0, {
 		virt_text = { { text, highlight } },
 		priority = cfg.get().priority,
 	})
-end
-
----@param dep Dependency
----@param crate Crate
----@param buf integer
----@param ns integer
-local function show_dep(dep, crate, buf, ns)
-	if cfg.get().format.version.enabled then
-		show_dep_version(dep, crate, buf, ns)
-	end
 end
 
 ---@param dep Dependency
