@@ -45,3 +45,9 @@ The plugin can be configured with the following options in the `setup` function:
       - `{error}`: Error message.
 - `cache`:
   - `timeout` (integer): Timeout of the crates cache invalidation in milliseconds (default: `300000`).
+
+## License
+
+This crate is distributed under the terms of MIT License.
+
+See [LICENSE](https://codeberg.org/frofor/cargo-ghost/src/branch/main/LICENSE) for details.
