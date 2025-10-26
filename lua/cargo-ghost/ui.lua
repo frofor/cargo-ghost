@@ -30,9 +30,9 @@ local function show_dep(dep, crate, buf, ns)
 	if not cfg.get().format.dependency.enabled then return end
 
 	local stable = crate.stable_version
-	local newest = crate.newest_version
+	local latest = crate.latest_version
 	local wanted
-	if cfg.get().wanted_version == 'stable' then wanted = stable else wanted = newest end
+	if cfg.get().wanted_version == 'stable' then wanted = stable else wanted = latest end
 
 	local text, highlight
 	if not wanted then

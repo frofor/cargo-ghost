@@ -29,7 +29,7 @@ The plugin can be configured with the following options in the `setup` function:
 - `priority` (integer): Priority of the virtual text. Highest priority is last (default: `90`).
 - `wanted_version`: Wanted version of dependencies. Possible values:
   - `'stable'`: Stable version (default).
-  - `'newest'`: Newest version, such as RC.
+  - `'latest'`: Latest version, such as RC.
 - `format`: Format of the virtual text.
   - `dependency`: Format of the dependency virtual text.
     - `enabled` (boolean): Whether virtual text should be shown (default: `true`).

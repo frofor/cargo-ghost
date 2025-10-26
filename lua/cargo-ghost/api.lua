@@ -15,7 +15,7 @@ end
 ---@field docs string?
 ---@field repo string?
 ---@field stable_version string?
----@field newest_version string
+---@field latest_version string
 ---@field downloads integer
 ---@field recent_downloads integer
 
@@ -69,7 +69,7 @@ local function get_crate(name, fn)
 				docs = prim(data.crate.documentation),
 				repo = prim(data.crate.repository),
 				stable_version = prim(data.crate.max_stable_version),
-				newest_version = data.crate.newest_version,
+				latest_version = data.crate.max_version,
 				downloads = data.crate.downloads,
 				recent_downloads = data.crate.recent_downloads,
 			}

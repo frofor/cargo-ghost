@@ -15,13 +15,13 @@
 ---@class Config
 ---@field enabled boolean
 ---@field priority integer
----@field wanted_version 'stable'|'newest'
+---@field wanted_version 'stable'|'latest'
 ---@field format FormatConfig
 ---@field cache CacheConfig
 local cfg = {
 	enabled = true,
 	priority = 90,
-	wanted_version = 'newest',
+	wanted_version = 'stable',
 	format = {
 		dependency = {
 			enabled = true,
